@@ -2,7 +2,7 @@
 
 <project|polkadot_host_spec.tm>
 
-<style|book>
+<style|<tuple|book|/home/anon/.TeXmacs/packages/algorithmacs-style.tx|algorithmacs-style>>
 
 <\body>
   <chapter|State Transition><label|chap-state-transit>
@@ -678,41 +678,46 @@
   functionalities which allows identifying changes in the blockchain without
   requiring to search through the entire chain. The <strong|Changes Trie> is
   a radix-16 tree datastructure as defined in Definition
-  <reference|defn-radix-tree> and maintained by the Polkadot node. It tracks
-  every storage change created by each block. The primary method of
-  generating the Changes Trie is by calling the
-  <verbatim|ext_storage_changes_root> Host API as described in section
-  <reference|sect-ext-storage-changes-root>. In order to provide this API
+  <reference|defn-radix-tree> and maintained by the Polkadot Host. It stores
+  different types of storage changes made by every block.
+
+  \;
+
+  The primary method for generating the Changes Trie is provided to the
+  Runtime with the <verbatim|ext_storage_changes_root> Host API as described
+  in section <reference|sect-ext-storage-changes-root>. The Runtime calls
+  that function shortly before finalizing the block, the Polkadot Host must
+  then generate the Changes Trie based on the storage changes which occured
+  during block production or execution. In order to provide this API
   function, it is imperative that the Polkadot Host implements a mechanism to
   keep track of the changes created by individual blocks, as mentioned in
   section <reference|sect-state-storage>.
 
   \;
 
-  The Changes Trie tracks changes of three different types of mappings. The
-  inserted key/value mapping into the Changes Trie is formally defined as:
+  The Changes Trie stores three different types of changes. The inserted
+  key-value pair in the Changes Trie is formally defined as:
 
   <\equation*>
-    <around*|(|A<rsub|Type>,H<rsub|i><around*|(|B|)>,\<cal-K\>|)>\<rightarrow\>A<rsub|Value>
+    <around*|(|A<rsub|Type>,H<rsub|i><around*|(|B<rsub|i>|)>,K|)>\<rightarrow\>A<rsub|Value>
   </equation*>
 
-  where <math|\<cal-K\>> is the changed storage key and <math|A<rsub|Type>>
-  is a varying datatype as defined in Definition
-  <reference|defn-varrying-data-type>. Its type including the corresponding
-  value is defined in table <reference|table-changes-trie-key-types>. The
-  format and use of these values are specified in more detail in their
-  corresponding definitions <reference|defn-storage-key-to-extrinsics>,
-  <reference|defn-storage-key-to-blocks> and
-  <reference|defn-storage-key-to-child-tries> respectivly.<htab|5mm>
+  where <math|K> is the changed storage key,
+  <math|H<rsub|i><around*|(|B<rsub|i>|)>> refers to the block number at which
+  this key is inserted into the Changes Trie and <math|A<rsub|Type>> is a
+  varying datatype as defined in Definition
+  <reference|defn-varrying-data-type>. The type including its corresponding
+  value is defined in table <reference|table-changes-trie-key-types>.<htab|5mm>
 
   <\big-table>
-    <tabular|<tformat|<cwith|2|2|1|-1|cell-bborder|0ln>|<cwith|4|4|1|-1|cell-tborder|1ln>|<cwith|4|4|1|-1|cell-bborder|0ln>|<cwith|5|5|1|-1|cell-tborder|1ln>|<cwith|5|5|1|-1|cell-bborder|1ln>|<cwith|5|5|1|1|cell-lborder|0ln>|<cwith|5|5|3|3|cell-rborder|0ln>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|1ln>|<cwith|2|2|1|-1|cell-tborder|1ln>|<cwith|1|1|1|1|cell-lborder|0ln>|<cwith|1|1|3|3|cell-rborder|0ln>|<table|<row|<cell|<strong|Type>>|<cell|<strong|Description>>|<cell|<strong|Value>>>|<row|<cell|1>|<cell|Mapping
-    between storage key and extrinsics (<reference|defn-storage-key-to-extrinsics>)>|<cell|<math|<around*|(|e<rsub|i>,\<ldots\>,e<rsub|n>|)>>>>|<row|<cell|>|<cell|<text-dots>
+    <tabular|<tformat|<cwith|2|2|1|-1|cell-bborder|0ln>|<cwith|4|4|1|-1|cell-tborder|1ln>|<cwith|4|4|1|-1|cell-bborder|0ln>|<cwith|5|5|1|-1|cell-tborder|1ln>|<cwith|5|5|1|-1|cell-bborder|1ln>|<cwith|5|5|1|1|cell-lborder|0ln>|<cwith|5|5|3|3|cell-rborder|0ln>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|1ln>|<cwith|2|2|1|-1|cell-tborder|1ln>|<cwith|1|1|1|1|cell-lborder|0ln>|<cwith|1|1|3|3|cell-rborder|0ln>|<table|<row|<cell|<strong|Type>>|<cell|<strong|Description>>|<cell|<strong|Value>>>|<row|<cell|1>|<cell|Pair
+    between storage key and extrinsics (section
+    <reference|sect-changes-trie-extrinsics-pairs>)>|<cell|<math|<around*|{|e<rsub|i>,\<ldots\>,e<rsub|n>|}>>>>|<row|<cell|>|<cell|<text-dots>
     where <math|e<rsub|i> refers to the >indice of the extrinsic within the
-    block>|<cell|>>|<row|<cell|2>|<cell|Mapping between storage key and
-    blocks (<reference|defn-storage-key-to-blocks>)>|<cell|<math|<around*|(|H<rsub|i><around*|(|B<rsub|i>|)>,\<ldots\>,H<rsub|i><around*|(|B<rsub|n>|)>|)>>>>|<row|<cell|3>|<cell|Mapping
-    between storage key and Child Changes Trie
-    (<reference|defn-storage-key-to-child-tries>)>|<cell|<math|H<rsub|r><around*|(|<text|<em|ChildStorage<em|>>>|)>>>>>>>
+    block>|<cell|>>|<row|<cell|2>|<cell|Pair between storage key and block
+    numbers (section <reference|sect-changes-trie-block-pairs>)>|<cell|<math|<around*|{|H<rsub|i><around*|(|B<rsub|n>|)>,\<ldots\>,H<rsub|i><around*|(|B<rsub|m>|)>|}>>>>|<row|<cell|3>|<cell|Pair
+    between storage key and Child Changes Trie (section
+    <reference|sect-changes-trie-child-trie-pair>)>|<cell|<math|H<rsub|r><around*|(|<text|<name|Child-Changes-Trie>>|)>>>>>>>
 
     \;
   <|big-table>
@@ -723,60 +728,160 @@
   <strong|Note>: Unlike the default encoding for varying data types, this
   structure starts its indexing at <verbatim|1>.
 
-  <\definition>
-    <label|defn-storage-key-to-extrinsics>The <strong|storage key to
-    extrinsics mappings> track any changes which occure in an individual
-    block. Its value is a SCALE encoded array containing the indices of the
-    extrinsics that caused any changes to its key. The indices are unsigned
-    32-bit integers and their values is based on the order in which each
-    extrinsic is appears in the block. Additionally, a separate Changes Trie
-    is created for each child storage where changes occured.
-
-    \;
-
-    Keys that were modified outside of extrinsics, such as changes made by
-    the Runtime directly, have a <verbatim|0xffffffff> value as its indice.
-
-    \;
-
-    The Changes Trie is generated when the Runtime calls
-    <verbatim|ext_storage_changes_root> as described in section
-    <reference|sect-ext-storage-changes-root>.
-  </definition>
-
-  <\definition>
-    <label|defn-storage-key-to-blocks>The <strong|storage key to blocks
-    mappings> track any changes which occured in a certain range of blocks.
-    Its value is a SCALE encoded array containing block numbers where
-    extrinsics caused any changes to its key. The block numbers are
-    represented as unsigned 32-bit integers.
-
-    \;
-
-    The Changes Trie is generated when the Runtime calls
-    <verbatim|ext_storage_changes_root> as described in section
-    <reference|sect-ext-storage-changes-root>, but unlike the other mappings,
-    those are not generated on each block.
-  </definition>
-
-  <\definition>
-    <label|defn-storage-key-to-child-tries>The <strong|storage key to Child
-    Changes Tries mappings> track any storage keys from child storages and
-    their corresponding Child Changes Trie. As described in Definition
-    <reference|defn-storage-key-to-extrinsics>, changes inside child storages
-    are inserted into their own Trie. The changed child storage key is
-    inserted into the main Trie, where its value is the Merkle proof as
-    desribed in section <reference|sect-merkl-proof> of the corresponding
-    Child Storage Trie.
-  </definition>
+  \;
 
   The Changes Trie itself is not part of the block, but a separately
-  maintained database by the Polkadot node. The Merkle proof of the Changes
-  Trie must be inlcuded in the block digest as described in Definition
+  maintained database by the Polkadot Host. The Merkle proof of the Changes
+  Trie must be included in the block digest as described in Definition
   <reference|defn-digest> and gets calculated as described in section
-  <reference|sect-merkl-proof>. The root calculation uses entries of a
-  per-block basis (including block mappings when conditions apply on that
-  block), not the whole changes spanning multiple blocks.
+  <reference|sect-merkl-proof>. The root calculation only considers pairs
+  which were generated on the individual block and does not consider pairs
+  which were generated at previous blocks.
+
+  \;
+
+  <todo|This seperately maintained database by the Polkadot Host is intended
+  to be used by \Pproof servers\Q, where its implementation and behavior has
+  not been fully defined yet. This is considered future-reserved>
+
+  \;
+
+  As clarified in the individual sections of each type, not all of those
+  types get generated on every block. But if conditions apply, all those
+  different types of pairs get inserted into the same Changes Trie, therefore
+  only one Changes Trie Root gets generated for each block.
+
+  <subsubsection|Key to extrinsics pairs><label|sect-changes-trie-extrinsics-pairs>
+
+  This key-value pair stores changes which occure in an individual block. Its
+  value is a SCALE encoded array containing the indices of the extrinsics
+  that caused any changes to the specified key. The key-value pair is defined
+  as (clarified in section <reference|sect-changes-trie>):
+
+  <\equation*>
+    <around*|(|1,H<rsub|i><around*|(|B<rsub|i>|)>,K|)>\<rightarrow\><around*|{|e<rsub|i>,\<ldots\>,e<rsub|n>|}>
+  </equation*>
+
+  The indices are unsigned 32-bit integers and their values are based on the
+  order in which each extrinsics appears in the block (indexing starts at 0).
+  The Polkadot Host generates those pairs for every changed key on each and
+  every block. Child storages have their own Changes Trie, as described in
+  section <reference|sect-changes-trie-child-trie-pair>.
+
+  \;
+
+  <todo|clarify special key value of 0xffffffff>
+
+  <subsubsection|Key to block pairs><label|sect-changes-trie-block-pairs>
+
+  This key-value pair stores changes which occured in a certain range of
+  blocks. Its value is a SCALE encoded array containing block numbers in
+  which extrinsics caused any changes to the specified key. The key-value
+  pair is defined as (clarified in section <reference|sect-changes-trie>):
+
+  <\equation*>
+    <around*|(|2,H<rsub|i><around*|(|B<rsub|i>|)>,K|)>\<rightarrow\><around*|{|H<rsub|i><around*|(|B<rsub|n>|)>,\<ldots\>,H<rsub|i><around*|(|B<rsub|m>|)>|}>
+  </equation*>
+
+  The block numbers are represented as unsigned 32-bit integers. There are
+  multiple \Plevels\Q of those pairs, and the Polkadot Host does <strong|not>
+  generate those pairs on every block. The genesis state contains the key
+  <verbatim|:changes_trie> where its unsigned 64-bit value is a tuple of two
+  32-bit integers:
+
+  <\itemize-dot>
+    <item><verbatim|interval> - The interval (in blocks) at which those pairs
+    should be created. If this value is less or equal to 1 it means that
+    those pairs are not created at all.
+
+    <item><verbatim|levels> - The maximum number of \Plevels\Q in the
+    hierarchy. If this value is 0 it means that those pairs are not created
+    at all.
+  </itemize-dot>
+
+  For each level from 1 to <verbatim|levels>, the Polkadot Host creates those
+  pairs on every <verbatim|<math|<text|interval<rsup|level><verbatim|>>>>-nth
+  block, formally applied as:
+
+  <\algorithm|<name|Key-To-Block-Pairs>(<math|B<rsub|i>>, interval, levels)>
+    <strong|Initialize:>
+
+    1. <math|I=interval>
+
+    2. <math|L=levels>
+
+    <strong|for each> <math|l\<in\><around*|{|1,\<ldots\>,L|}>>
+
+    3.<space|1em>if <math|H<rsub|i><around*|(|B<rsub|i>|)>=I<rsup|l>>
+
+    4.<space|2em><name|Insert-Blocks>(<math|H<rsub|i><around*|(|B<rsub|i>|)>>,
+    <math|I<rsup|l>>)
+  </algorithm>
+
+  <\itemize-dot>
+    <item><math|B<rsub|i>> implies the block at which those pairs gets
+    inserted into the Changes Trie.
+
+    <item><name|Insert-Blocks> - Inserts every block number within the range
+    <math|H<rsub|i><around*|(|B<rsub|i>|)>-I<rsup|l>+1> to
+    <math|H<rsub|i><around*|(|B<rsub|i>|)>> in which any extrinsic changed
+    the specified key.
+  </itemize-dot>
+
+  \;
+
+  For example, let's say <verbatim|interval> is set at <verbatim|4> and
+  <verbatim|levels> is set at <verbatim|3>. This means there are now three
+  levels which get generated at three different occurences:
+
+  <\enumerate-numeric>
+    <item><strong|Level 1> - Those pairs are generated at every
+    <math|<text|<strong|4<rsup|1>>>>-nth block, where the pair value contains
+    the block numbers of every block that changed the specified storage key.
+    This level only considers block numbers of the last four
+    (<math|=4<rsup|1>>) blocks.
+
+    <\itemize-dot>
+      <item>Example: this level occurs at block 4, 8, 12, 16, 32, etc.
+    </itemize-dot>
+
+    <item><strong|Level 2> - Those pairs are generated at every
+    <math|<text|<strong|4<rsup|2>>>>-nth block, where the pair value contains
+    the block numbers of every block that changed the specified storage key.
+    This level only considers block numbers of the last 16
+    (<math|=4<rsup|2>>) blocks.
+
+    <\itemize-dot>
+      <item>Example: this level occurs at block 16, 32, 64, 128, 256, etc.
+    </itemize-dot>
+
+    <item><strong|Level 3> - Those pairs are generated at every
+    <text|<math|<text|<strong|4<rsup|3>>>>>-nth block, where the pair value
+    contains the block numbers of every block that changed the specified
+    storage key. this level only considers block number of the last 64
+    (<math|=4<rsup|3>>) blocks.
+
+    <\itemize-dot>
+      <item>Example: this level occurs at block 64, 128, 196, 256, 320, etc.
+    </itemize-dot>
+  </enumerate-numeric>
+
+  <subsubsection|Key to Child Changes Trie
+  pairs><label|sect-changes-trie-child-trie-pair>
+
+  The Polkadot Host generates a separate Changes Trie for each child storage,
+  using the same behavior and implementation as describe in section
+  <reference|sect-changes-trie-extrinsics-pairs>. Additionally, the changed
+  child storage key gets inserted into the primary, non-Child Changes Trie
+  where its value is a SCALE encoded byte array containing the Merkle root of
+  the Child Changes Trie. The key-value pair is defined as:
+
+  <\equation*>
+    <around*|(|3,H<rsub|i><around*|(|B<rsub|i>|)>,K|)>\<rightarrow\>H<rsub|r><around*|(|<text|<name|Child-Changes-Trie>>|)>
+  </equation*>
+
+  The Polkadot Host creates those pairs for every changes child key for each
+  and every block.
 </body>
 
 <\initial>
@@ -793,71 +898,72 @@
 
 <\references>
   <\collection>
-    <associate|algo-import-and-validate-block|<tuple|3.4|?>>
-    <associate|algo-maintain-transaction-pool|<tuple|3.3|?>>
-    <associate|algo-runtime-interaction|<tuple|3.1|?>>
-    <associate|algo-validate-transactions|<tuple|3.2|?>>
-    <associate|auto-1|<tuple|3|?>>
-    <associate|auto-10|<tuple|3.2.2|?>>
-    <associate|auto-11|<tuple|3.2.2.1|?>>
-    <associate|auto-12|<tuple|3.2.3|?>>
-    <associate|auto-13|<tuple|3.2.3|?>>
-    <associate|auto-14|<tuple|3.2.3|?>>
-    <associate|auto-15|<tuple|3.2.3|?>>
-    <associate|auto-16|<tuple|<with|mode|<quote|math>|<rigid|->>|?>>
-    <associate|auto-17|<tuple|3.2.3.1|?>>
-    <associate|auto-18|<tuple|3.1|?>>
-    <associate|auto-19|<tuple|3.3|?>>
-    <associate|auto-2|<tuple|3.1|?>>
-    <associate|auto-20|<tuple|3.3.1|?>>
-    <associate|auto-21|<tuple|3.3.1.1|?>>
-    <associate|auto-22|<tuple|3.2|?>>
-    <associate|auto-23|<tuple|3.3.1.2|?>>
-    <associate|auto-24|<tuple|3.3.1.3|?>>
-    <associate|auto-25|<tuple|3.3.2|?>>
-    <associate|auto-26|<tuple|3.3.3|?>>
-    <associate|auto-27|<tuple|3.3.4|?>>
-    <associate|auto-28|<tuple|3.3.5|?>>
-    <associate|auto-29|<tuple|3.3|?>>
-    <associate|auto-3|<tuple|3.1.1|?>>
-    <associate|auto-30|<tuple|3.4|?>>
-    <associate|auto-4|<tuple|3.1.2|?>>
-    <associate|auto-5|<tuple|3.1.2.1|?>>
-    <associate|auto-6|<tuple|3.1.2.2|?>>
-    <associate|auto-7|<tuple|3.1.2.3|?>>
-    <associate|auto-8|<tuple|3.2|?>>
-    <associate|auto-9|<tuple|3.2.1|?>>
-    <associate|block|<tuple|3.3.1.1|?>>
-    <associate|chap-state-transit|<tuple|3|?>>
-    <associate|defn-block-body|<tuple|3.9|?>>
-    <associate|defn-block-header|<tuple|3.6|?>>
-    <associate|defn-block-header-hash|<tuple|3.8|?>>
-    <associate|defn-digest|<tuple|3.7|?>>
-    <associate|defn-inherent-data|<tuple|3.5|?>>
-    <associate|defn-key-index|<tuple|3.11|?>>
-    <associate|defn-set-state-at|<tuple|3.10|?>>
-    <associate|defn-storage-key-to-blocks|<tuple|3.12|?>>
-    <associate|defn-storage-key-to-child-tries|<tuple|3.13|?>>
-    <associate|defn-storage-key-to-extrinsics|<tuple|3.11|?>>
-    <associate|defn-transaction-queue|<tuple|3.4|?>>
-    <associate|nota-call-into-runtime|<tuple|3.2|?>>
-    <associate|nota-runtime-code-at-state|<tuple|3.1|?>>
-    <associate|sect-block-body|<tuple|3.3.1.3|?>>
-    <associate|sect-block-format|<tuple|3.3.1|?>>
-    <associate|sect-block-submission|<tuple|3.3.2|?>>
-    <associate|sect-block-validation|<tuple|3.3.3|?>>
-    <associate|sect-changes-trie|<tuple|3.3.5|?>>
-    <associate|sect-entries-into-runtime|<tuple|3.1|?>>
-    <associate|sect-extrinsics|<tuple|3.2|?>>
-    <associate|sect-justified-block-header|<tuple|3.3.1.2|?>>
-    <associate|sect-loading-runtime-code|<tuple|3.1.1|?>>
-    <associate|sect-managing-multiple-states|<tuple|3.3.4|?>>
-    <associate|sect-runtime-return-value|<tuple|3.1.2.3|?>>
-    <associate|sect-runtime-send-args-to-runtime-enteries|<tuple|3.1.2.2|?>>
-    <associate|sect-state-replication|<tuple|3.3|?>>
-    <associate|tabl-digest-items|<tuple|3.2|?>>
-    <associate|tabl-inherent-data|<tuple|3.1|?>>
-    <associate|table-changes-trie-key-types|<tuple|3.3|?>>
+    <associate|algo-import-and-validate-block|<tuple|3.4|28>>
+    <associate|algo-maintain-transaction-pool|<tuple|3.3|26>>
+    <associate|algo-runtime-interaction|<tuple|3.1|23>>
+    <associate|algo-validate-transactions|<tuple|3.2|25>>
+    <associate|auto-1|<tuple|3|23>>
+    <associate|auto-10|<tuple|3.2.2|25>>
+    <associate|auto-11|<tuple|3.2.2.1|25>>
+    <associate|auto-12|<tuple|3.2.3|25>>
+    <associate|auto-13|<tuple|3.2.3|25>>
+    <associate|auto-14|<tuple|3.2.3|25>>
+    <associate|auto-15|<tuple|3.2.3|25>>
+    <associate|auto-16|<tuple|<with|mode|<quote|math>|<rigid|->>|26>>
+    <associate|auto-17|<tuple|3.2.3.1|26>>
+    <associate|auto-18|<tuple|3.1|26>>
+    <associate|auto-19|<tuple|3.3|26>>
+    <associate|auto-2|<tuple|3.1|23>>
+    <associate|auto-20|<tuple|3.3.1|27>>
+    <associate|auto-21|<tuple|3.3.1.1|27>>
+    <associate|auto-22|<tuple|3.2|27>>
+    <associate|auto-23|<tuple|3.3.1.2|28>>
+    <associate|auto-24|<tuple|3.3.1.3|28>>
+    <associate|auto-25|<tuple|3.3.2|28>>
+    <associate|auto-26|<tuple|3.3.3|28>>
+    <associate|auto-27|<tuple|3.3.4|29>>
+    <associate|auto-28|<tuple|3.3.5|29>>
+    <associate|auto-29|<tuple|3.3|29>>
+    <associate|auto-3|<tuple|3.1.1|23>>
+    <associate|auto-30|<tuple|3.3.5.1|30>>
+    <associate|auto-31|<tuple|3.3.5.2|30>>
+    <associate|auto-32|<tuple|3.3.5.3|31>>
+    <associate|auto-4|<tuple|3.1.2|24>>
+    <associate|auto-5|<tuple|3.1.2.1|24>>
+    <associate|auto-6|<tuple|3.1.2.2|24>>
+    <associate|auto-7|<tuple|3.1.2.3|24>>
+    <associate|auto-8|<tuple|3.2|24>>
+    <associate|auto-9|<tuple|3.2.1|25>>
+    <associate|block|<tuple|3.3.1.1|27>>
+    <associate|chap-state-transit|<tuple|3|23>>
+    <associate|defn-block-body|<tuple|3.9|28>>
+    <associate|defn-block-header|<tuple|3.6|27>>
+    <associate|defn-block-header-hash|<tuple|3.8|28>>
+    <associate|defn-digest|<tuple|3.7|27>>
+    <associate|defn-inherent-data|<tuple|3.5|26>>
+    <associate|defn-set-state-at|<tuple|3.10|29>>
+    <associate|defn-transaction-queue|<tuple|3.4|25>>
+    <associate|nota-call-into-runtime|<tuple|3.2|24>>
+    <associate|nota-runtime-code-at-state|<tuple|3.1|24>>
+    <associate|sect-block-body|<tuple|3.3.1.3|28>>
+    <associate|sect-block-format|<tuple|3.3.1|27>>
+    <associate|sect-block-submission|<tuple|3.3.2|28>>
+    <associate|sect-block-validation|<tuple|3.3.3|28>>
+    <associate|sect-changes-trie|<tuple|3.3.5|29>>
+    <associate|sect-changes-trie-block-pairs|<tuple|3.3.5.2|?>>
+    <associate|sect-changes-trie-child-trie-pair|<tuple|3.3.5.3|?>>
+    <associate|sect-changes-trie-extrinsics-pairs|<tuple|3.3.5.1|?>>
+    <associate|sect-entries-into-runtime|<tuple|3.1|23>>
+    <associate|sect-extrinsics|<tuple|3.2|24>>
+    <associate|sect-justified-block-header|<tuple|3.3.1.2|28>>
+    <associate|sect-loading-runtime-code|<tuple|3.1.1|23>>
+    <associate|sect-managing-multiple-states|<tuple|3.3.4|29>>
+    <associate|sect-runtime-return-value|<tuple|3.1.2.3|24>>
+    <associate|sect-runtime-send-args-to-runtime-enteries|<tuple|3.1.2.2|24>>
+    <associate|sect-state-replication|<tuple|3.3|26>>
+    <associate|tabl-digest-items|<tuple|3.2|27>>
+    <associate|tabl-inherent-data|<tuple|3.1|26>>
+    <associate|table-changes-trie-key-types|<tuple|3.3|29>>
   </collection>
 </references>
 
@@ -879,6 +985,10 @@
 
       <tuple|normal|<surround|<hidden-binding|<tuple>|3.2>||The detail of the
       varying type that a digest item can hold.>|<pageref|auto-22>>
+
+      <tuple|normal|<\surround|<hidden-binding|<tuple>|3.3>|>
+        Possible types of keys of mappings in the Changes Trie
+      </surround>|<pageref|auto-29>>
     </associate>
     <\associate|toc>
       <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|3<space|2spc>State
@@ -962,6 +1072,22 @@
       <with|par-left|<quote|1tab>|3.3.4<space|2spc>Managaing Multiple
       Variants of State <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-27>>
+
+      <with|par-left|<quote|1tab>|3.3.5<space|2spc>Changes Trie
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-28>>
+
+      <with|par-left|<quote|2tab>|3.3.5.1<space|2spc>Key to extrinsics pairs
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-30>>
+
+      <with|par-left|<quote|2tab>|3.3.5.2<space|2spc>Key to block pairs
+      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-31>>
+
+      <with|par-left|<quote|2tab>|3.3.5.3<space|2spc>Key to Child Changes
+      Trie pairs <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
+      <no-break><pageref|auto-32>>
     </associate>
   </collection>
 </auxiliary>
