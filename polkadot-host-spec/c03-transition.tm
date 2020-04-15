@@ -707,15 +707,16 @@
   this key is inserted into the Changes Trie and <math|A<rsub|Type>> is a
   varying datatype as defined in Definition
   <reference|defn-varrying-data-type>. The type including its corresponding
-  value is defined in table <reference|table-changes-trie-key-types>.<htab|5mm>
+  value <math|A<rsub|Value>> is defined in table
+  <reference|table-changes-trie-key-types>.<htab|5mm>
 
   <\big-table>
     <tabular|<tformat|<cwith|2|2|1|-1|cell-bborder|0ln>|<cwith|4|4|1|-1|cell-tborder|1ln>|<cwith|4|4|1|-1|cell-bborder|0ln>|<cwith|5|5|1|-1|cell-tborder|1ln>|<cwith|5|5|1|-1|cell-bborder|1ln>|<cwith|5|5|1|1|cell-lborder|0ln>|<cwith|5|5|3|3|cell-rborder|0ln>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|1ln>|<cwith|2|2|1|-1|cell-tborder|1ln>|<cwith|1|1|1|1|cell-lborder|0ln>|<cwith|1|1|3|3|cell-rborder|0ln>|<table|<row|<cell|<strong|Type>>|<cell|<strong|Description>>|<cell|<strong|Value>>>|<row|<cell|1>|<cell|Pair
     between storage key and extrinsics (section
-    <reference|sect-changes-trie-extrinsics-pairs>)>|<cell|<math|<around*|{|e<rsub|i>,\<ldots\>,e<rsub|n>|}>>>>|<row|<cell|>|<cell|<text-dots>
+    <reference|sect-changes-trie-extrinsics-pairs>)>|<cell|<math|<around*|{|e<rsub|i>,\<ldots\>,e<rsub|k>|}>>>>|<row|<cell|>|<cell|<text-dots>
     where <math|e<rsub|i> refers to the >indice of the extrinsic within the
     block>|<cell|>>|<row|<cell|2>|<cell|Pair between storage key and block
-    numbers (section <reference|sect-changes-trie-block-pairs>)>|<cell|<math|<around*|{|H<rsub|i><around*|(|B<rsub|n>|)>,\<ldots\>,H<rsub|i><around*|(|B<rsub|m>|)>|}>>>>|<row|<cell|3>|<cell|Pair
+    numbers (section <reference|sect-changes-trie-block-pairs>)>|<cell|<math|<around*|{|H<rsub|i><around*|(|B<rsub|k>|)>,\<ldots\>,H<rsub|i><around*|(|B<rsub|m>|)>|}>>>>|<row|<cell|3>|<cell|Pair
     between storage key and Child Changes Trie (section
     <reference|sect-changes-trie-child-trie-pair>)>|<cell|<math|H<rsub|r><around*|(|<text|<name|Child-Changes-Trie>>|)>>>>>>>
 
@@ -759,7 +760,7 @@
   as (clarified in section <reference|sect-changes-trie>):
 
   <\equation*>
-    <around*|(|1,H<rsub|i><around*|(|B<rsub|i>|)>,K|)>\<rightarrow\><around*|{|e<rsub|i>,\<ldots\>,e<rsub|n>|}>
+    <around*|(|1,H<rsub|i><around*|(|B<rsub|i>|)>,K|)>\<rightarrow\><around*|{|e<rsub|i>,\<ldots\>,e<rsub|k>|}>
   </equation*>
 
   The indices are unsigned 32-bit integers and their values are based on the
@@ -780,7 +781,7 @@
   pair is defined as (clarified in section <reference|sect-changes-trie>):
 
   <\equation*>
-    <around*|(|2,H<rsub|i><around*|(|B<rsub|i>|)>,K|)>\<rightarrow\><around*|{|H<rsub|i><around*|(|B<rsub|n>|)>,\<ldots\>,H<rsub|i><around*|(|B<rsub|m>|)>|}>
+    <around*|(|2,H<rsub|i><around*|(|B<rsub|i>|)>,K|)>\<rightarrow\><around*|{|H<rsub|i><around*|(|B<rsub|k>|)>,\<ldots\>,H<rsub|i><around*|(|B<rsub|m>|)>|}>
   </equation*>
 
   The block numbers are represented as unsigned 32-bit integers. There are
