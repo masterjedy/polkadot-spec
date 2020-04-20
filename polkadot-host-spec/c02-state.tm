@@ -1,4 +1,4 @@
-<TeXmacs|1.99.11>
+<TeXmacs|1.99.12>
 
 <project|polkadot_host_spec.tm>
 
@@ -18,10 +18,14 @@
 
   \;
 
-  The state storage requires a mechanism to identify any changes made by each
-  block, in case non-finalized blocks have to be reverted or a Changes Trie
-  as described in section <reference|sect-general-tree-structure> needs to be
-  created. This specification does not dictate how that mechanism must be
+  As Polkadot is a distributed system, state inconsistencies naturally occurs
+  among different nodes. To cope with such a situation, the state storage
+  requires a mechanism to identify and keep the history of the changes made
+  by each individual block. This information is required when for example,
+  non-finalized blocks have to be reverted, the node is storing various forks
+  of the state simultaneously or a Changes Trie as described in section
+  <reference|sect-general-tree-structure> needs to be created. This
+  specification, however, does not dictate how that mechanism must be
   implemented.
 
   <subsection|Accessing System Storage >
@@ -483,6 +487,14 @@
     Trie. The <strong|Merkle hash> of the Trie is defined to be
     <math|H<around*|(|R|)>>.
   </definition>
+
+  \;
+
+  <\with|par-mode|right>
+    <qed>
+  </with>
+
+  \;
 </body>
 
 <\initial>
@@ -502,37 +514,27 @@
     <associate|algo-aggregate-key|<tuple|2.1|?>>
     <associate|algo-pk-length|<tuple|2.2|?>>
     <associate|auto-1|<tuple|2|?>>
-    <associate|auto-10|<tuple|2.2|?>>
     <associate|auto-2|<tuple|2.1|?>>
     <associate|auto-3|<tuple|2.1.1|?>>
     <associate|auto-4|<tuple|2.1|?>>
     <associate|auto-5|<tuple|2.1.2|?>>
     <associate|auto-6|<tuple|2.1.3|?>>
     <associate|auto-7|<tuple|2.1.4|?>>
-    <associate|auto-8|<tuple|2.1.5|?>>
-    <associate|auto-9|<tuple|2.1|?>>
     <associate|chap-state-spec|<tuple|2|?>>
-    <associate|defn-changes-trie|<tuple|2.1.5|?>>
     <associate|defn-children-bitmap|<tuple|2.10|?>>
     <associate|defn-index-function|<tuple|2.7|?>>
-    <associate|defn-key-index|<tuple|2.13|?>>
     <associate|defn-merkle-value|<tuple|2.12|?>>
     <associate|defn-node-header|<tuple|2.9|?>>
     <associate|defn-node-key|<tuple|2.6|?>>
     <associate|defn-node-subvalue|<tuple|2.11|?>>
     <associate|defn-node-value|<tuple|2.8|?>>
     <associate|defn-nodetype|<tuple|2.4|?>>
-    <associate|defn-storage-key-to-blocks|<tuple|2.15|?>>
-    <associate|defn-storage-key-to-child-tries|<tuple|2.16|?>>
-    <associate|defn-storage-key-to-extrinsics|<tuple|2.14|?>>
     <associate|defn-stored-value|<tuple|2.1|?>>
     <associate|key-encode-in-trie|<tuple|2.1|?>>
-    <associate|sect-changes-trie|<tuple|2.1.5|?>>
     <associate|sect-general-tree-structure|<tuple|2.1.2|?>>
     <associate|sect-merkl-proof|<tuple|2.1.4|?>>
     <associate|sect-state-storage|<tuple|2.1|?>>
     <associate|sect-state-storage-trie-structure|<tuple|2.1.3|?>>
-    <associate|table-changes-trie-key-types|<tuple|2.1|?>>
   </collection>
 </references>
 
@@ -547,15 +549,6 @@
       <with|mode|<quote|math>|\<cal-V\>\<subset\>\<bbb-B\>> are respectively
       the set of all keys and values stored in the state
       storage.|<pageref|auto-4>>
-    </associate>
-    <\associate|table>
-      <tuple|normal|<\surround|<hidden-binding|<tuple>|2.1>|>
-        Possible types of keys of mappings in the Changes Trie
-      </surround>|<pageref|auto-9>>
-
-      <tuple|normal|<\surround|<hidden-binding|<tuple>|2.2>|>
-        Key structure inserted in the Changes Trie
-      </surround>|<pageref|auto-10>>
     </associate>
     <\associate|toc>
       <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|2<space|2spc>State
@@ -581,10 +574,6 @@
       <with|par-left|<quote|1tab>|2.1.4<space|2spc>Merkle Proof
       <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
       <no-break><pageref|auto-7>>
-
-      <with|par-left|<quote|1tab>|2.1.5<space|2spc>Changes Trie
-      <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>>
-      <no-break><pageref|auto-8>>
     </associate>
   </collection>
 </auxiliary>
