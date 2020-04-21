@@ -1,20 +1,20 @@
-<TeXmacs|1.99.11>
+<TeXmacs|1.99.12>
 
 <project|polkadot_host_spec.tm>
 
-<style|<tuple|book|/home/anon/.TeXmacs/packages/algorithmacs-style.tx|algorithmacs-style>>
+<style|<tuple|book|/home/anon/.TeXmacs/packages/algorithmacs-style.tx|algorithmacs-style|old-dots>>
 
 <\body>
   <chapter|State Transition><label|chap-state-transit>
 
-  Like any transaction-based transition system, Polkadot state changes via
-  executing an ordered set of instructions. These instructions are known as
-  <em|extrinsics>. In Polkadot, the execution logic of the state-transition
-  function is encapsulated in Runtime as defined in Definition
-  <reference|defn-state-machine>. Runtime is presented as a Wasm blob in
-  order to be easily upgradable. Nonetheless, the Polkadot Host needs to be
-  in constant interaction with Runtime. The detail of such interaction is
-  further described in Section <reference|sect-entries-into-runtime>.
+  Like any transaction-based transition system, Polkadot state
+  changes via executing an ordered set of instructions. These instructions
+  are known as <em|extrinsics>. In Polkadot, the execution logic of the
+  state-transition function is encapsulated in Runtime as defined in
+  Definition <reference|defn-state-machine>. Runtime is presented as a Wasm
+  blob in order to be easily upgradable. Nonetheless, the Polkadot Host needs
+  to be in constant interaction with Runtime. The detail of such interaction
+  is further described in Section <reference|sect-entries-into-runtime>.
 
   In Section <reference|sect-extrinsics>, we specify the procedure of the
   process where the extrinsics are submitted, pre-processed and validated by
@@ -642,10 +642,10 @@
   State><label|sect-managing-multiple-states>
 
   Unless a node is committed to only update its state according to the
-  finalized block (See Definition <reference|defn-finalized-block>), it is
-  inevitable for the node to store multiple variants of the state (one for
-  each block). This is, for example, necessary for nodes participating in the
-  block production and finalization.
+  finalized blocks (See Definition <reference|defn-finalized-block>), it is
+  inevitable for the node to store multiple variants of the state (e.g. one
+  for each block). This is, for example, necessary for nodes participating in
+  the block production and finalization.
 
   While the state trie structure described in Section
   <reference|sect-state-storage-trie-structure> facilitates and optimizes
@@ -677,59 +677,69 @@
   Polkadot focuses on light client friendliness and therefore implements
   functionalities which allows identifying changes in the blockchain without
   requiring to search through the entire chain. The <strong|Changes Trie> is
-  a radix-16 tree datastructure as defined in Definition
+  a radix-16 tree data structure as defined in Definition
   <reference|defn-radix-tree> and maintained by the Polkadot Host. It stores
-  different types of storage changes made by every block.
+  different types of storage changes made by each individual block
+  separately.
 
   \;
 
   The primary method for generating the Changes Trie is provided to the
   Runtime with the <verbatim|ext_storage_changes_root> Host API as described
-  in section <reference|sect-ext-storage-changes-root>. The Runtime calls
+  in Section <reference|sect-ext-storage-changes-root>. The Runtime calls
   that function shortly before finalizing the block, the Polkadot Host must
   then generate the Changes Trie based on the storage changes which occured
   during block production or execution. In order to provide this API
   function, it is imperative that the Polkadot Host implements a mechanism to
   keep track of the changes created by individual blocks, as mentioned in
-  section <reference|sect-state-storage>.
+  Sections <reference|sect-state-storage> and
+  <reference|sect-managing-multiple-states>.
 
-  \;
+  The Changes Trie stores three different types of changes.\ 
 
-  The Changes Trie stores three different types of changes. The inserted
-  key-value pair in the Changes Trie is formally defined as:
+  <\definition>
+    The <strong|inserted key-value pair stored in the nodes of Changes Trie>
+    is formally defined as:
+  </definition>
 
   <\equation*>
-    <around*|(|A<rsub|Type>,H<rsub|i><around*|(|B<rsub|i>|)>,K|)>\<rightarrow\>A<rsub|Value>
+    <around*|(|K<rsub|C>,V<rsub|C>|)>
   </equation*>
+
+  Where <math|K<rsub|C>> is a SCALE-encoded Tuple
+
+  <\equation*>
+    Enc<rsub|sc><around*|(|<around*|(|Type<rsub|V<rsub|C>><rsub|><rsub|>,H<rsub|i><around*|(|B<rsub|i>|)>,K|)>|)>
+  </equation*>
+
+  and
+
+  <\equation*>
+    V<rsub|C>=Enc<rsub|SC><around*|(|C<rsub|value>|)>
+  </equation*>
+
+  is SCALE encoded byte array.
 
   where <math|K> is the changed storage key,
   <math|H<rsub|i><around*|(|B<rsub|i>|)>> refers to the block number at which
-  this key is inserted into the Changes Trie and <math|A<rsub|Type>> is a
-  varying datatype as defined in Definition
-  <reference|defn-varrying-data-type>. The type including its corresponding
-  value <math|A<rsub|Value>> is defined in table
+  this key is inserted into the Changes Trie (See Definition
+  <reference|defn-block-header>) and <math|Type<rsub|V<rsub|C>>> is an index
+  defining the type \ <math|C<rsub|Value>> according to Table
   <reference|table-changes-trie-key-types>.<htab|5mm>
 
   <\big-table>
-    <tabular|<tformat|<cwith|2|2|1|-1|cell-bborder|0ln>|<cwith|4|4|1|-1|cell-tborder|1ln>|<cwith|4|4|1|-1|cell-bborder|0ln>|<cwith|5|5|1|-1|cell-tborder|1ln>|<cwith|5|5|1|-1|cell-bborder|1ln>|<cwith|5|5|1|1|cell-lborder|0ln>|<cwith|5|5|3|3|cell-rborder|0ln>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|1ln>|<cwith|2|2|1|-1|cell-tborder|1ln>|<cwith|1|1|1|1|cell-lborder|0ln>|<cwith|1|1|3|3|cell-rborder|0ln>|<table|<row|<cell|<strong|Type>>|<cell|<strong|Description>>|<cell|<strong|Value>>>|<row|<cell|1>|<cell|Pair
-    between storage key and extrinsics (section
-    <reference|sect-changes-trie-extrinsics-pairs>)>|<cell|<math|<around*|{|e<rsub|i>,\<ldots\>,e<rsub|k>|}>>>>|<row|<cell|>|<cell|<text-dots>
-    where <math|e<rsub|i> refers to the >indice of the extrinsic within the
-    block>|<cell|>>|<row|<cell|2>|<cell|Pair between storage key and block
-    numbers (section <reference|sect-changes-trie-block-pairs>)>|<cell|<math|<around*|{|H<rsub|i><around*|(|B<rsub|k>|)>,\<ldots\>,H<rsub|i><around*|(|B<rsub|m>|)>|}>>>>|<row|<cell|3>|<cell|Pair
-    between storage key and Child Changes Trie (section
-    <reference|sect-changes-trie-child-trie-pair>)>|<cell|<math|H<rsub|r><around*|(|<text|<name|Child-Changes-Trie>>|)>>>>>>>
+    <tabular|<tformat|<cwith|2|2|1|-1|cell-bborder|0ln>|<cwith|4|4|1|-1|cell-tborder|1ln>|<cwith|4|4|1|-1|cell-bborder|0ln>|<cwith|5|5|1|-1|cell-tborder|1ln>|<cwith|5|5|1|-1|cell-bborder|1ln>|<cwith|5|5|1|1|cell-lborder|0ln>|<cwith|5|5|3|3|cell-rborder|0ln>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|1ln>|<cwith|2|2|1|-1|cell-tborder|1ln>|<cwith|1|1|1|1|cell-lborder|0ln>|<cwith|1|1|3|3|cell-rborder|0ln>|<table|<row|<cell|<strong|Type>>|<cell|<strong|Description>>|<cell|<strong|<math|C<rsub|Value>>>>>|<row|<cell|1>|<cell|list
+    of extrinsics indices (section <reference|sect-changes-trie-extrinsics-pairs>)>|<cell|<math|<around*|{|e<rsub|i>,\<ldots\>,e<rsub|k>|}>>>>|<row|<cell|>|<cell|where
+    <math|e<rsub|i>> refers to the index of the extrinsic within the
+    block>|<cell|>>|<row|<cell|2>|<cell|list of block numbers (section
+    <reference|sect-changes-trie-block-pairs>)>|<cell|<math|<around*|{|H<rsub|i><around*|(|B<rsub|k>|)>,\<ldots\>,H<rsub|i><around*|(|B<rsub|m>|)>|}>>>>|<row|<cell|3>|<cell|Child
+    Changes Trie (section <reference|sect-changes-trie-child-trie-pair>)>|<cell|<math|H<rsub|r><around*|(|<text|<name|Child-Changes-Trie>>|)>>>>>>>
 
     \;
   <|big-table>
     <label|table-changes-trie-key-types>Possible types of keys of mappings in
     the Changes Trie
   </big-table>
-
-  <strong|Note>: Unlike the default encoding for varying data types, this
-  structure starts its indexing at <verbatim|1>.
-
-  \;
 
   The Changes Trie itself is not part of the block, but a separately
   maintained database by the Polkadot Host. The Merkle proof of the Changes
@@ -804,16 +814,11 @@
   pairs on every <verbatim|<math|<text|interval<rsup|level><verbatim|>>>>-nth
   block, formally applied as:
 
-  <\algorithm|<name|Key-To-Block-Pairs>(<math|B<rsub|i>>, interval, levels)>
-    <strong|Initialize:>
-
-    1. <math|I=interval>
-
-    2. <math|L=levels>
-
+  <\algorithm|<name|Key-To-Block-Pairs>(<math|B<rsub|i>>, <math|I>: interval,
+  <math|L:>levels>
     <strong|for each> <math|l\<in\><around*|{|1,\<ldots\>,L|}>>
 
-    3.<space|1em>if <math|H<rsub|i><around*|(|B<rsub|i>|)>=I<rsup|l>>
+    3.<space|1em>if <math|H<rsub|i><around*|(|B<rsub|i>|)>=I<rsup|l>><verbatim|>
 
     4.<space|2em><name|Insert-Blocks>(<math|H<rsub|i><around*|(|B<rsub|i>|)>>,
     <math|I<rsup|l>>)
@@ -883,6 +888,10 @@
 
   The Polkadot Host creates those pairs for every changes child key for each
   and every block.
+
+  <\with|par-mode|right>
+    <qed>
+  </with>
 </body>
 
 <\initial>
@@ -892,6 +901,7 @@
     <associate|page-height|auto>
     <associate|page-type|letter>
     <associate|page-width|auto>
+    <associate|par-par-sep|1fns>
     <associate|section-nr|1<uninit>>
     <associate|subsection-nr|4>
   </collection>

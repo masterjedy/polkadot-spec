@@ -26,7 +26,8 @@
   of the state simultaneously or a Changes Trie as described in section
   <reference|sect-general-tree-structure> needs to be created. This
   specification, however, does not dictate how that mechanism must be
-  implemented.
+  implemented. For more detail see Section
+  <reference|sect-managing-multiple-states>.
 
   <subsection|Accessing System Storage >
 
