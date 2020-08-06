@@ -28,8 +28,8 @@ set(CMAKE_TOOLCHAIN_FILE
 # Setup hunter
 include(cmake/HunterGate.cmake)
 HunterGate(
-    URL "https://github.com/soramitsu/soramitsu-hunter/archive/v0.23.253-soramitsu4.tar.gz"
-    SHA1 "e55ec201201d1e5726b0c849c1c8e2fee003ab9f"
+    URL "https://github.com/soramitsu/soramitsu-hunter/archive/v0.23.254-soramitsu1.tar.gz"
+    SHA1 "7819e7dd14f58b6df2fd7f2bc835265d60add3f5"
     FILEPATH "${CMAKE_SOURCE_DIR}/cmake/HunterConfig.cmake"
 )
 
@@ -43,40 +43,44 @@ project(kagome-adapter LANGUAGES CXX C)
 hunter_add_package(kagome)
 hunter_add_package(yaml-cpp)
 
-find_package(kagome REQUIRED)
+find_package(kagome CONFIG REQUIRED COMPONENTS polkadot_trie_batch trie_db_backend)
 find_package(yaml-cpp REQUIRED)
 
 # FIXME Kagome's package config should do all this!
 find_package(ed25519 REQUIRED)
 find_package(sr25519 REQUIRED)
-find_package(Boost REQUIRED COMPONENTS program_options random)
+find_package(Boost REQUIRED COMPONENTS filesystem program_options random)
 find_package(leveldb REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(xxhash REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(libp2p REQUIRED)
 find_package(binaryen REQUIRED)
+find_package(libsecp256k1 CONFIG REQUIRED)
 
 # Compile and link tester
 add_executable(kagome-adapter
   src/main.cpp
   src/scale_codec.cpp
   src/scale_codec.hpp
+  src/trie.hpp
   src/trie.cpp
   src/subcommand_router.hpp
-  src/trie.hpp
   src/extension.cpp
   src/extension.hpp
-  src/extension/storage.cpp
-  src/extension/storage.hpp
-  src/extension/network.cpp
-  src/extension/network.hpp
   src/extension/child_storage.cpp
   src/extension/child_storage.hpp
   src/extension/crypto.cpp
   src/extension/crypto.hpp
+  src/extension/hashing.hpp
+  src/extension/hashing.cpp
   src/extension/helpers.cpp
-  src/extension/helpers.hpp
+  src/extension/network.cpp
+  src/extension/network.hpp
+  src/extension/storage.cpp
+  src/extension/storage.hpp
+  src/extension/trie.hpp
+  src/extension/trie.cpp
 )
 
 # FIXME This should not be necessary, but not all public headers include from <kagome/..> (e.g. "outcome/outcome.hpp")

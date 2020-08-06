@@ -16,7 +16,20 @@
 #along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
 
 # TODO: Move away from custom kagome branch for testing
+#hunter_config(kagome
+#    URL https://github.com/soramitsu/kagome/archive/af5c718a05a3b734291dd2c4f574c8dffb76ad46.tar.gz
+#    SHA1 81f456bb92d06e7b5861dacb66d4ff77515dadf6
+#)
+
+hunter_config(libsecp256k1
+        URL https://github.com/soramitsu/soramitsu-libsecp256k1/archive/c7630e1bac638c0f16ee66d4dce7b5c49eecbaa5.zip
+        SHA1 179e316b0fe5150f1b05ca70ec2ac1490fe2cb3b
+        CMAKE_ARGS SECP256K1_BUILD_TEST=OFF
+        )
+
 hunter_config(kagome
-    URL https://github.com/soramitsu/kagome/archive/af5c718a05a3b734291dd2c4f574c8dffb76ad46.tar.gz
-    SHA1 81f456bb92d06e7b5861dacb66d4ff77515dadf6
-)
+        URL https://github.com/soramitsu/kagome/archive/c7940f99a48f28d560edc1253059b7bacc3cea8f.tar.gz
+        SHA1 687822d26489ce9ecb1b2d6cd31e7751fbcf79c2
+        )
+
+

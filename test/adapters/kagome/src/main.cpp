@@ -59,9 +59,9 @@ int main(int argc, char **argv) {
   router.addSubcommand("scale-codec", [](int argc, char **argv) {
     processScaleCodecCommand(extractScaleArgs(argc, argv));
   });
-  router.addSubcommand("state-trie", [](int argc, char **argv) {
-    processTrieCommand(extractTrieArgs(argc, argv));
-  });
+//  router.addSubcommand("state-trie", [](int argc, char **argv) {
+//    processTrieCommand(extractTrieArgs(argc, argv));
+//  });
   router.addSubcommand("host-api", [](int argc, char **argv) {
     processExtensionsCommands(extractExtensionArgs(argc, argv));
   });
