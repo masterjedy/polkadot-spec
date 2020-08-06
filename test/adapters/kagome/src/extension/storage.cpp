@@ -41,14 +41,14 @@ namespace storage {
         kagome::common::Buffer buffer;
 
         buffer.put(key1);
-        kagome::runtime::SizeType key1Size = buffer.size();
+        kagome::runtime::WasmSize key1Size = buffer.size();
         memory->resize(memory->size() + buffer.size());
         kagome::runtime::WasmPointer key1Ptr = memory->allocate(key1Size);
         memory->storeBuffer(key1Ptr, buffer);
         buffer.clear();
 
         buffer.put(value1);
-        kagome::runtime::SizeType value1Size = buffer.size();
+        kagome::runtime::WasmSize value1Size = buffer.size();
         memory->resize(memory->size() + buffer.size());
         kagome::runtime::WasmPointer value1Ptr = memory->allocate(value1Size);
         memory->storeBuffer(value1Ptr, buffer);
@@ -57,14 +57,14 @@ namespace storage {
         extension->ext_set_storage(key1Ptr, key1Size, value1Ptr, value1Size);
 
         buffer.put(key2);
-        kagome::runtime::SizeType key2Size = buffer.size();
+        kagome::runtime::WasmSize key2Size = buffer.size();
         memory->resize(memory->size() + buffer.size());
         kagome::runtime::WasmPointer key2Ptr = memory->allocate(key2Size);
         memory->storeBuffer(key2Ptr, buffer);
         buffer.clear();
 
         buffer.put(value2);
-        kagome::runtime::SizeType value2Size = buffer.size();
+        kagome::runtime::WasmSize value2Size = buffer.size();
         memory->resize(memory->size() + buffer.size());
         kagome::runtime::WasmPointer value2Ptr = memory->allocate(value2Size);
         memory->storeBuffer(value2Ptr, buffer);
@@ -73,17 +73,17 @@ namespace storage {
         extension->ext_set_storage(key2Ptr, key2Size, value2Ptr, value2Size);
 
         buffer.put(prefix);
-        kagome::runtime::SizeType prefixSize = buffer.size();
+        kagome::runtime::WasmSize  prefixSize = buffer.size();
         kagome::runtime::WasmPointer prefixPtr = memory->allocate(prefixSize);
         memory->storeBuffer(prefixPtr, buffer);
         buffer.clear();
 
         extension->ext_clear_prefix(prefixPtr, prefixSize);
 
-        kagome::runtime::SizeType sizePtrSize = sizeof(kagome::runtime::SizeType);
+        kagome::runtime::WasmSize  sizePtrSize = sizeof(kagome::runtime::WasmSize );
         kagome::runtime::WasmPointer sizePtr = memory->allocate(sizePtrSize);
         auto res = extension->ext_get_allocated_storage(key1Ptr, key1Size, sizePtr);
-        kagome::runtime::SizeType written_out = memory->load32u(sizePtr);
+        kagome::runtime::WasmSize  written_out = memory->load32u(sizePtr);
         if (prefix == key1.substr(0, prefix.size())) {
             BOOST_ASSERT_MSG(written_out == memory->kMaxMemorySize,
                              "Value 1 wasn't deleted");
@@ -136,22 +136,22 @@ namespace storage {
         kagome::common::Buffer buffer;
 
         buffer.put(key);
-        kagome::runtime::SizeType keySize = buffer.size();
+        kagome::runtime::WasmSize keySize = buffer.size();
         kagome::runtime::WasmPointer keyPtr = memory->allocate(keySize);
         memory->storeBuffer(keyPtr, buffer);
         buffer.clear();
 
         buffer.put(value);
-        kagome::runtime::SizeType valueSize = buffer.size();
+        kagome::runtime::WasmSize valueSize = buffer.size();
         kagome::runtime::WasmPointer valuePtr = memory->allocate(valueSize);
         memory->storeBuffer(valuePtr, buffer);
         buffer.clear();
 
         extension->ext_set_storage(keyPtr, keySize, valuePtr, valueSize);
-        kagome::runtime::SizeType sizePtrSize = sizeof(kagome::runtime::SizeType);
+        kagome::runtime::WasmSize sizePtrSize = sizeof(kagome::runtime::WasmSize);
         kagome::runtime::WasmPointer sizePtr = memory->allocate(sizePtrSize);
         auto res = extension->ext_get_allocated_storage(keyPtr, keySize, sizePtr);
-        kagome::runtime::SizeType written_out = memory->load32u(sizePtr);
+        kagome::runtime::WasmSize written_out = memory->load32u(sizePtr);
         BOOST_ASSERT_MSG(written_out == valueSize, "No value");
         BOOST_ASSERT_MSG(memory->loadN(res, written_out) ==
                          memory->loadN(valuePtr, written_out),
@@ -182,18 +182,18 @@ namespace storage {
         kagome::common::Buffer buffer;
 
         buffer.put(key);
-        kagome::runtime::SizeType keySize = buffer.size();
+        kagome::runtime::WasmSize keySize = buffer.size();
         kagome::runtime::WasmPointer keyPtr = memory->allocate(keySize);
         memory->storeBuffer(keyPtr, buffer);
         buffer.clear();
 
         buffer.put(value);
-        kagome::runtime::SizeType valueSize = buffer.size();
+        kagome::runtime::WasmSize valueSize = buffer.size();
         kagome::runtime::WasmPointer valuePtr = memory->allocate(valueSize);
         memory->storeBuffer(valuePtr, buffer);
         buffer.clear();
 
-        kagome::runtime::SizeType storageSize =
+        kagome::runtime::WasmSize storageSize =
                 extension->ext_exists_storage(keyPtr, keySize);
         BOOST_ASSERT_MSG(storageSize == 0, "Storage exists");
 
@@ -219,21 +219,21 @@ namespace storage {
         kagome::common::Buffer buffer;
 
         buffer.put(key);
-        kagome::runtime::SizeType keySize = buffer.size();
+        kagome::runtime::WasmSize keySize = buffer.size();
         kagome::runtime::WasmPointer keyPtr = memory->allocate(keySize);
         memory->storeBuffer(keyPtr, buffer);
         buffer.clear();
 
         buffer.put(value);
-        kagome::runtime::SizeType valueSize = buffer.size();
+        kagome::runtime::WasmSize valueSize = buffer.size();
         kagome::runtime::WasmPointer valuePtr = memory->allocate(valueSize);
         memory->storeBuffer(valuePtr, buffer);
         buffer.clear();
 
-        kagome::runtime::SizeType sizePtrSize = sizeof(kagome::runtime::SizeType);
+        kagome::runtime::WasmSize sizePtrSize = sizeof(kagome::runtime::WasmSize);
         kagome::runtime::WasmPointer sizePtr = memory->allocate(sizePtrSize);
         auto res = extension->ext_get_allocated_storage(keyPtr, keySize, sizePtr);
-        kagome::runtime::SizeType written_out = memory->load32u(sizePtr);
+        kagome::runtime::WasmSize written_out = memory->load32u(sizePtr);
         BOOST_ASSERT_MSG(written_out == kagome::runtime::WasmMemory::kMaxMemorySize,
                          "Data exists");
         BOOST_ASSERT_MSG(res == 0, "Data exists");
@@ -269,18 +269,18 @@ namespace storage {
         kagome::common::Buffer buffer;
 
         buffer.put(key);
-        kagome::runtime::SizeType keySize = buffer.size();
+        kagome::runtime::WasmSize keySize = buffer.size();
         kagome::runtime::WasmPointer keyPtr = memory->allocate(keySize);
         memory->storeBuffer(keyPtr, buffer);
         buffer.clear();
 
         buffer.put(value);
-        kagome::runtime::SizeType valueSize = buffer.size();
+        kagome::runtime::WasmSize valueSize = buffer.size();
         kagome::runtime::WasmPointer valuePtr = memory->allocate(valueSize);
         memory->storeBuffer(valuePtr, buffer);
         buffer.clear();
 
-        kagome::runtime::SizeType resultSize =
+        kagome::runtime::WasmSize resultSize =
                 valueSize < offset ? 0 : valueSize - offset;
         kagome::runtime::WasmPointer resultPtr = memory->allocate(resultSize);
 
@@ -325,51 +325,51 @@ namespace storage {
         kagome::common::Buffer buffer;
 
         buffer.put(key1);
-        kagome::runtime::SizeType key1Size = buffer.size();
+        kagome::runtime::WasmSize key1Size = buffer.size();
         kagome::runtime::WasmPointer key1Ptr = memory->allocate(key1Size);
         memory->storeBuffer(key1Ptr, buffer);
         buffer.clear();
 
         buffer.put(value1);
-        kagome::runtime::SizeType value1Size = buffer.size();
+        kagome::runtime::WasmSize value1Size = buffer.size();
         kagome::runtime::WasmPointer value1Ptr = memory->allocate(value1Size);
         memory->storeBuffer(value1Ptr, buffer);
         buffer.clear();
 
         buffer.put(key2);
-        kagome::runtime::SizeType key2Size = buffer.size();
+        kagome::runtime::WasmSize key2Size = buffer.size();
         kagome::runtime::WasmPointer key2Ptr = memory->allocate(key2Size);
         memory->storeBuffer(key2Ptr, buffer);
         buffer.clear();
 
         buffer.put(value2);
-        kagome::runtime::SizeType value2Size = buffer.size();
+        kagome::runtime::WasmSize value2Size = buffer.size();
         kagome::runtime::WasmPointer value2Ptr = memory->allocate(value2Size);
         memory->storeBuffer(value2Ptr, buffer);
         buffer.clear();
 
         buffer.put(":code");
-        kagome::runtime::SizeType prepareKey1Size = buffer.size();
+        kagome::runtime::WasmSize prepareKey1Size = buffer.size();
         kagome::runtime::WasmPointer prepareKey1Ptr =
                 memory->allocate(prepareKey1Size);
         memory->storeBuffer(prepareKey1Ptr, buffer);
         buffer.clear();
 
         buffer.put("");
-        kagome::runtime::SizeType prepareValue1Size = buffer.size();
+        kagome::runtime::WasmSize prepareValue1Size = buffer.size();
         kagome::runtime::WasmPointer prepareValue1Ptr =
                 memory->allocate(prepareValue1Size);
         memory->storeBuffer(prepareValue1Ptr, buffer);
         buffer.clear();
 
         buffer.put(":heappages");
-        kagome::runtime::SizeType prepareKey2Size = buffer.size();
+        kagome::runtime::WasmSize prepareKey2Size = buffer.size();
         kagome::runtime::WasmPointer prepareKey2Ptr =
                 memory->allocate(prepareKey2Size);
         memory->storeBuffer(prepareKey2Ptr, buffer);
         buffer.clear();
 
-        kagome::runtime::SizeType prepareValue2Size = 8;
+        kagome::runtime::WasmSize prepareValue2Size = 8;
         kagome::runtime::WasmPointer prepareValue2Ptr =
                 memory->allocate(prepareValue2Size);
         memory->store64(prepareValue2Ptr, 8);
@@ -402,13 +402,13 @@ namespace storage {
         kagome::common::Buffer buffer1;
 
         buffer1.put(value1);
-        kagome::runtime::SizeType value1Size = buffer1.size();
+        kagome::runtime::WasmSize value1Size = buffer1.size();
         memory->store32(valuesLenPtr, value1Size);
 
         kagome::common::Buffer buffer2;
 
         buffer2.put(value2);
-        kagome::runtime::SizeType value2Size = buffer2.size();
+        kagome::runtime::WasmSize value2Size = buffer2.size();
         memory->store32(valuesLenPtr + 4, value2Size);
 
         kagome::runtime::WasmPointer valuesPtr =
