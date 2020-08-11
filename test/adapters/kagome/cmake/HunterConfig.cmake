@@ -28,8 +28,8 @@ hunter_config(libsecp256k1
         )
 
 hunter_config(kagome
-        URL https://github.com/soramitsu/kagome/archive/c7940f99a48f28d560edc1253059b7bacc3cea8f.tar.gz
-        SHA1 687822d26489ce9ecb1b2d6cd31e7751fbcf79c2
+        URL https://github.com/soramitsu/kagome/archive/a069166e8ddc56668dbc4dfbc4335ad9741e79fb.tar.gz
+        SHA1 fa75b99a02486cc2c8f54b3f9e737b8bb4bb9c91
         )
 
 

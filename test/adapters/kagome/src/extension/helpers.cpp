@@ -42,6 +42,7 @@
 #include <storage/trie/impl/trie_storage_backend_impl.hpp>
 #include <blockchain/impl/storage_util.hpp>
 #include <storage/buffer_map_types.hpp>
+#include <runtime/common/trie_storage_provider_impl.hpp>
 
 namespace helpers {
 
@@ -60,16 +61,22 @@ namespace helpers {
 
 
         auto node_prefix = kagome::blockchain::prefix::TRIE_NODE;
-        auto buffer_storage = std::make_shared<kagome::storage::BufferStorage>();
-        auto trie_backend = std::make_shared<kagome::storage::trie::TrieStorageBackendImpl>(buffer_storage,
-                                                                                            node_prefix);
+
+        // TODO(yuraz) creat correctly
+//        auto buffer_storage = std::make_shared<kagome::storage::BufferStorage>();
+//        auto trie_backend = std::make_shared<kagome::storage::trie::TrieStorageBackendImpl>(buffer_storage,
+//                                                                                            node_prefix);
+
+        std::shared_ptr<kagome::storage::BufferStorage> buffer_storage;
+        std::shared_ptr<kagome::storage::trie::TrieStorageBackendImpl> trie_backend;
+
         auto trie_serializer = std::make_shared<kagome::storage::trie::TrieSerializerImpl>(trie_factory, codec,
                                                                                            trie_backend);
         auto tracker = std::make_shared<kagome::storage::changes_trie::StorageChangesTrackerImpl>(trie_factory, codec);
 
         auto trie = kagome::storage::trie::TrieStorageImpl::createEmpty(trie_factory, codec, trie_serializer,
                                                                         boost::make_optional<std::shared_ptr<kagome::storage::changes_trie::ChangesTracker>>(
-                                                                                tracker));
+                                                                                tracker)).value();
 
         std::shared_ptr<kagome::runtime::WasmMemory> memory =
                 std::make_shared<kagome::runtime::binaryen::WasmMemoryImpl>(&GLOBAL_WASM_SHELL.memory, 4096);
@@ -92,7 +99,8 @@ namespace helpers {
 
 
         std::unique_ptr<kagome::extensions::Extension> extension =
-                std::make_unique<kagome::extensions::ExtensionImpl>(memory, trie_storage_provider, sr25519_provider,
+                std::make_unique<kagome::extensions::ExtensionImpl>(memory, trie_storage_provider, tracker,
+                                                                    sr25519_provider,
                                                                     ed25519_provider, secp256k1_provider, hasher,
                                                                     crypto_store, bip39_provider);
 

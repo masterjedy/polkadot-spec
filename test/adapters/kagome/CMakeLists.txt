@@ -20,17 +20,17 @@ cmake_minimum_required(VERSION 3.12)
 
 # Setup toolchain (required by kagome and libp2p)
 set(CMAKE_TOOLCHAIN_FILE
-  "${CMAKE_SOURCE_DIR}/cmake/Toolchain.cmake"
-  CACHE FILEPATH "Default toolchain"
-)
+        "${CMAKE_SOURCE_DIR}/cmake/Toolchain.cmake"
+        CACHE FILEPATH "Default toolchain"
+        )
 
 
 # Setup hunter
 include(cmake/HunterGate.cmake)
 HunterGate(
-    URL "https://github.com/soramitsu/soramitsu-hunter/archive/v0.23.254-soramitsu1.tar.gz"
-    SHA1 "7819e7dd14f58b6df2fd7f2bc835265d60add3f5"
-    FILEPATH "${CMAKE_SOURCE_DIR}/cmake/HunterConfig.cmake"
+        URL "https://github.com/soramitsu/soramitsu-hunter/archive/v0.23.254-soramitsu1.tar.gz"
+        SHA1 "7819e7dd14f58b6df2fd7f2bc835265d60add3f5"
+        FILEPATH "${CMAKE_SOURCE_DIR}/cmake/HunterConfig.cmake"
 )
 
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG HUNTER_ENABLED)
@@ -43,7 +43,7 @@ project(kagome-adapter LANGUAGES CXX C)
 hunter_add_package(kagome)
 hunter_add_package(yaml-cpp)
 
-find_package(kagome CONFIG REQUIRED COMPONENTS polkadot_trie_batch trie_db_backend)
+find_package(kagome CONFIG REQUIRED COMPONENTS polkadot_trie_batch trie_db_backend changes_tracker polkadot_trie_factory)
 find_package(yaml-cpp REQUIRED)
 
 # FIXME Kagome's package config should do all this!
@@ -60,45 +60,45 @@ find_package(libsecp256k1 CONFIG REQUIRED)
 
 # Compile and link tester
 add_executable(kagome-adapter
-  src/main.cpp
-  src/scale_codec.cpp
-  src/scale_codec.hpp
-  src/trie.hpp
-  src/trie.cpp
-  src/subcommand_router.hpp
-  src/extension.cpp
-  src/extension.hpp
-  src/extension/child_storage.cpp
-  src/extension/child_storage.hpp
-  src/extension/crypto.cpp
-  src/extension/crypto.hpp
-  src/extension/hashing.hpp
-  src/extension/hashing.cpp
-  src/extension/helpers.cpp
-  src/extension/network.cpp
-  src/extension/network.hpp
-  src/extension/storage.cpp
-  src/extension/storage.hpp
-  src/extension/trie.hpp
-  src/extension/trie.cpp
-)
+        src/main.cpp
+        src/scale_codec.cpp
+        src/scale_codec.hpp
+        src/trie.hpp
+        src/trie.cpp
+        src/subcommand_router.hpp
+        src/extension.cpp
+        src/extension.hpp
+        src/extension/child_storage.cpp
+        src/extension/child_storage.hpp
+        src/extension/crypto.cpp
+        src/extension/crypto.hpp
+        src/extension/hashing.hpp
+        src/extension/hashing.cpp
+        src/extension/helpers.cpp
+        src/extension/network.cpp
+        src/extension/network.hpp
+        src/extension/storage.cpp
+        src/extension/storage.hpp
+        src/extension/trie.hpp
+        src/extension/trie.cpp
+        )
 
 # FIXME This should not be necessary, but not all public headers include from <kagome/..> (e.g. "outcome/outcome.hpp")
 target_include_directories(kagome-adapter PRIVATE ${kagome_INCLUDE_DIRS})
 
 target_link_libraries(kagome-adapter
-  Boost::program_options
-  yaml-cpp::yaml-cpp
-  ${kagome_LIBRARIES}
+        Boost::program_options
+        yaml-cpp::yaml-cpp
+        ${kagome_LIBRARIES}
 
-  # FIXME Patched-in export required for host-api testing
-  kagome::binaryen_wasm_memory
-)
+        # FIXME Patched-in export required for host-api testing
+        kagome::binaryen_wasm_memory
+        )
 
 
 # Install result
 include(GNUInstallDirs)
 
 install(TARGETS kagome-adapter
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        )
